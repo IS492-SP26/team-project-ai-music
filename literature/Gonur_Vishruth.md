@@ -20,3 +20,14 @@ Since the nueral network is resembling a human brain, it is very hard to continu
 Concrete Idea for the project:
 
 The idea of a having a neural network is really complicated however, we can have a backend ML model to help train the model into recognizing certain simple emotions such as happiness and sadness. For example high pitched notes represent happiness and low notes represent sadness
+
+MLA Citation for Article 2: Wang, Tianle, et al. “Discovering “Words” in Music: Unsupervised Learning of Compositional Sparse Code for Symbolic Music.” ArXiv.org, 2025, arxiv.org/abs/2509.24603?utm_source=chatgpt.com. Accessed 12 Feb. 2026.
+
+
+‌Summary: The second article I choose is titled, " “Words” in Music: Unsupervised Learning of Compositional Sparse Code for Symbolic Music ". This article talks about how a group of researchers used an unsupervised machine learning models to help understand and recognize patterns in music. Through this process it will enable AI to help make more meaningful music that actually feels like music and not gibberish beats thown together. It can also help detect things like plagerism in music by being able to recognize peices, and can help people lawful ownserhsip of their music 
+
+3 Things I learned: Unsupervised learning is better when it comes to trying to find patters with unstructured data such as music. Machine learning models can also allow for understanding music segments which can help find out if people steal music segments. Lastly through this process, AI can learn from these models and truly make music segments that are meaningful 
+
+2 Limitations: The patterns in music segemnts that they might find, may not be meaningful, as since there is no labels, the data has to find patterns within this data, furthermore the model needs to be trained on a LARGE amount of data which is really hard to come up with, especially for MIVI files.
+
+1 Concrete Idea: One concrete idea that we can implement, is using an Unsupervised model to learn simple music segments. This will help our model make more concrete music suggestions, and suggestions the user actually likes
