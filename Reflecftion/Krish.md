@@ -1,36 +1,39 @@
-Reflections on Co-Creative AI Research Papers
+1. AI Song Contest: Human–AI Co-Creation in
+Songwriting
+Citation:
+Huang, C.-Z. A., Koops, H. V., Newton-Rex, E., Dinculescu, M., &amp; Cai, C. J. (2020).
 
-1. The Co-Creative Framework for Collaborative Artificial Intelligence
+AI Song Contest: Human-AI Co-Creation in Songwriting. Proceedings of the 21st
+International Society for Music Information Retrieval Conference (ISMIR).
+Huang et al. (2020) study how real teams collaborated with AI systems to write
+complete songs. Instead of testing a single model, they observed 13 teams using
+many different AI tools in a contest setting. One key insight is that musicians rarely
+used end-to-end models. Instead of that, they broke songs into many smaller parts
+such as lyrics, melody, harmony, and drums, then combined outputs manually. This
+shows that current AI systems are not easily steerable. Many teams generated
+hundreds or thousands of samples and curated them afterward. This added extra
+work and slowed the creative process. The paper highlights an important tension: AI
+increases creative possibilities but also introduces new technical burdens. The
+authors argue that future systems must be more controllable, decomposable, and
+context-aware across different environments. This directly supports the idea of
+building a structured songwriting copilot instead of a one-click generator, because
+users need guidance, iteration, and control to feel ownership.
 
-Citation: Kantosalo, A., & Toivonen, H. (2016). The Co-Creative Framework for Collaborative
-Artificial Intelligence.
-
-In this paper, Kantosalo and Toivonen explain what it means for AI to be co-creative.
-They argue that AI should not fully replace humans in creative tasks.
-Instead, AI should work together with people. The paper explains ideas like turn-taking,
-shared initiative, and different roles the AI can play. Sometimes the AI can suggest ideas.
-Other times, the human can guide the direction. The authors also explain that a good
-co-creative system must allow the human to feel ownership of the final result.
-What we found most important is the idea of balance. If the AI does too much, the human
-feels less creative. If the AI does too little, it is not helpful. The system should support
-creativity without taking control. This connects strongly to our songwriting copilot. We want
-the AI to guide users step by step. The user should still make decisions about mood, lyrics,
-and structure. This keeps creativity human-centered and meaningful.
-
-2. Co-Creative Systems for Musical Interaction:
-
-Citation: Frid, E., Ek, R., & Sundström, P. (2020). Co-Creative Systems for Musical Interaction:
-A Survey.
-
-This paper reviews many AI music systems that work with humans.
-The authors study how AI and musicians interact during music creation.
-Some systems generate full songs automatically. Other systems allow humans to edit parts
-of the music while the AI provides suggestions. The paper compares these approaches and
-discusses how interaction style affects creativity and user experience. One key idea from the
-paper is that collaboration matters more than automation. When AI generates everything,
-users may feel impressed but not involved. When AI allows users to change lyrics, melody, or
-structure, people feel more connected to the music. The paper also shows that interactive
-systems support learning and experimentation. This is important for our project because we
-are building a guided songwriting tool, not a one-click generator.
-We want users to revise sections, explore chord options, and understand how songs are
-built. That makes the experience educational and creative at the same time.
+2. Evaluating Human-AI Interaction for MMM-C
+Citation:
+Tchemeube, R. B., Ens, J., Plut, C., Pasquier, P., Safi, M., Grabit, Y., &amp; Rolland, J.-
+B. (2025). Evaluating Human-AI Interaction via Usability, User Experience and
+Acceptance Measures for MMM-C. arXiv:2504.14071.
+Tchemeube et al. (2025) evaluate a co-creative AI music tool called MMM-C, which
+is integrated into a professional music production software (Cubase). Unlike many
+research systems, this tool was tested with expert composers. The study measured
+usability, creativity support, and technology acceptance. Results showed that users
+enjoyed the system and found it useful for exploration, but they struggled with
+controllability. The interface only had one main parameter, temperature, which
+limited precision. Participants often had to repeatedly generate outputs until they
+found something usable. While the AI produced surprising and novel ideas, users
+wanted more detailed control over structure and musical attributes. Importantly, most
+composers still felt creative ownership of their work, meaning the AI acted more as a
+collaborator than a replacement. This paper reinforces the idea that co-creative AI
+systems must balance simplicity and control. Too little control reduces
+expressiveness, but thoughtful interaction design can improve adoption and trust.
