@@ -21,11 +21,11 @@ This paper explores how to make AI music collaboration feel truly interactive ra
 
 **Limitations / Risks**
 
-Evaluation is largely qualitative and demo-based rather than grounded in controlled user studies.
+- Evaluation is largely qualitative and demo-based rather than grounded in controlled user studies.
 
-AI music tools may influence creative diversity or shift collaborative dynamics between musicians.
+- AI music tools may influence creative diversity or shift collaborative dynamics between musicians.
 
-Project Inspiration
+**Project Inspiration**
 
 Prioritize real-time interaction and user agency in my project design, possibly incorporating structured turn-taking or low-latency feedback mechanisms.
 
@@ -52,9 +52,9 @@ This paper focuses on the challenge of generating higher-voice harmonies for a g
 
 **Limitations / Risks**
 
-Multi-agent coordination increases system complexity and potential error propagation.
+- Multi-agent coordination increases system complexity and potential error propagation.
 
-Technical harmonic correctness does not fully capture creativity or listener preference.
+- Technical harmonic correctness does not fully capture creativity or listener preference.
 
 **Project Inspiration**
 
