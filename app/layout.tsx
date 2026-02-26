@@ -48,6 +48,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="font-sans antialiased">
+        <div className="w-full bg-background py-1 text-center text-xs text-muted-foreground">
+          made by VG, JK, IS
+        </div>
         {children}
         <Analytics />
       </body>
