@@ -13,28 +13,39 @@ interface BeatTabProps {
 export function BeatTab({ beat, input }: BeatTabProps) {
   const [isDownloading, setIsDownloading] = useState(false)
 
-  const handleDownload = async () => {
+  const downloadMidi = async () => {
+    console.log("[MIDI Download] Button clicked, starting request to /api/midi")
     setIsDownloading(true)
     try {
-      const response = await fetch("/api/midi", {
+      const res = await fetch("/api/midi", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ beat, input }),
       })
 
-      if (!response.ok) throw new Error("Failed to generate MIDI")
+      console.log("[MIDI Download] Response status:", res.status, res.statusText)
 
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
+      if (!res.ok) {
+        const text = await res.text()
+        console.error("[MIDI Download] Non-OK response:", text)
+        throw new Error("MIDI generation failed")
+      }
+
+      const blob = await res.blob()
+      console.log("[MIDI Download] Blob received, size:", blob.size, "type:", blob.type)
+
+      const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = "beatAI_project.mid"
+      a.download = "BeatAI.mid"
       document.body.appendChild(a)
       a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error("Download failed:", error)
+      a.remove()
+      window.URL.revokeObjectURL(url)
+
+      console.log("[MIDI Download] Download triggered successfully")
+    } catch (err) {
+      console.error("[MIDI Download] Error:", err)
     } finally {
       setIsDownloading(false)
     }
@@ -133,7 +144,7 @@ export function BeatTab({ beat, input }: BeatTabProps) {
 
       {/* Download */}
       <Button
-        onClick={handleDownload}
+        onClick={downloadMidi}
         disabled={isDownloading}
         className="w-full gap-2 rounded-xl bg-accent py-5 text-accent-foreground hover:bg-accent/90"
       >

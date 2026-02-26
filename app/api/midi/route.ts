@@ -1,6 +1,8 @@
 import MidiWriter from "midi-writer-js"
 import type { BeatStructure, GenerationInput } from "@/lib/types"
 
+export const runtime = "nodejs"
+
 // Map chord names to MIDI note arrays
 const chordToNotes: Record<string, string[]> = {
   C: ["C4", "E4", "G4"],
@@ -29,10 +31,10 @@ function getChordNotes(chordName: string): string[] {
   return chordToNotes[cleanName] || chordToNotes["C"]
 }
 
-export async function POST(req: Request) {
-  const { beat, input }: { beat: BeatStructure; input: GenerationInput } =
-    await req.json()
-
+function generateMidiFile(
+  beat: BeatStructure,
+  input: GenerationInput
+): Uint8Array {
   const tracks: MidiWriter.Track[] = []
 
   // Chord track
@@ -145,11 +147,32 @@ export async function POST(req: Request) {
 
   const writer = new MidiWriter.Writer(tracks)
   const midiData = writer.buildFile()
+  return midiData instanceof Uint8Array ? midiData : new Uint8Array(midiData)
+}
 
-  return new Response(Buffer.from(midiData), {
-    headers: {
-      "Content-Type": "audio/midi",
-      "Content-Disposition": 'attachment; filename="beatAI_project.mid"',
-    },
-  })
+export async function POST(req: Request) {
+  try {
+    console.log("[MIDI API] POST /api/midi received")
+    const { beat, input }: { beat: BeatStructure; input: GenerationInput } =
+      await req.json()
+
+    if (!beat || !input) {
+      console.error("[MIDI API] Missing beat or input in request body")
+      return new Response("Missing beat or input", { status: 400 })
+    }
+
+    const midiBytes = generateMidiFile(beat, input)
+    console.log("[MIDI API] Generated MIDI size:", midiBytes.byteLength, "bytes")
+
+    return new Response(midiBytes, {
+      headers: {
+        "Content-Type": "audio/midi",
+        "Content-Disposition": 'attachment; filename="BeatAI.mid"',
+        "Cache-Control": "no-store",
+      },
+    })
+  } catch (error) {
+    console.error("[MIDI API] MIDI generation error:", error)
+    return new Response("Failed to generate MIDI", { status: 500 })
+  }
 }
