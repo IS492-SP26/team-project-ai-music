@@ -5,10 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScriptTab } from "@/components/script-tab"
 import { BeatTab } from "@/components/beat-tab"
 import { LearningTab } from "@/components/learning-tab"
-import type { GenerationResult, GenerationInput } from "@/lib/types"
+import type { GenerationResult, GenerationInput, GenerateGroqResponse } from "@/lib/types"
 
 interface OutputPanelProps {
-  result: GenerationResult | null
+  result: GenerationResult | GenerateGroqResponse | null
   input: GenerationInput | null
   isLoading: boolean
 }
@@ -60,9 +60,29 @@ function LoadingState() {
   )
 }
 
+function isGroqResult(result: GenerationResult | GenerateGroqResponse): result is GenerateGroqResponse {
+  return "result" in result && typeof (result as GenerateGroqResponse).result === "string"
+}
+
 export function OutputPanel({ result, input, isLoading }: OutputPanelProps) {
   if (isLoading) return <LoadingState />
   if (!result || !input) return <EmptyState />
+
+  if (isGroqResult(result)) {
+    return (
+      <div className="flex h-full flex-col rounded-2xl border border-border/40 bg-card/50 p-6 backdrop-blur-sm">
+        <h3
+          className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          Song script & beat plan
+        </h3>
+        <div className="flex-1 overflow-y-auto whitespace-pre-wrap rounded-lg bg-secondary/20 p-4 text-sm text-foreground">
+          {result.result}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm">

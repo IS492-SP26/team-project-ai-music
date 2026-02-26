@@ -5,14 +5,15 @@ import Link from "next/link"
 import { Music, ArrowLeft } from "lucide-react"
 import { InputPanel } from "@/components/input-panel"
 import { OutputPanel } from "@/components/output-panel"
-import type { GenerationInput, GenerationResult } from "@/lib/types"
+import type { GenerationInput, GenerationResult, GenerateGroqResponse } from "@/lib/types"
 
 export default function CreatePage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<GenerationResult | null>(null)
+  const [result, setResult] = useState<GenerationResult | GenerateGroqResponse | null>(null)
   const [currentInput, setCurrentInput] = useState<GenerationInput | null>(null)
 
   const handleGenerate = async (input: GenerationInput) => {
+    console.log("[Create] Generate clicked, topic:", input.topic)
     setIsLoading(true)
     setResult(null)
     setCurrentInput(input)
@@ -21,15 +22,22 @@ export default function CreatePage() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        body: JSON.stringify({ topic: input.topic }),
       })
 
-      if (!response.ok) throw new Error("Generation failed")
+      console.log("[Create] Response status:", response.status, response.statusText)
+
+      if (!response.ok) {
+        const text = await response.text()
+        console.error("[Create] Non-OK response:", text)
+        throw new Error("Generation failed")
+      }
 
       const data = await response.json()
+      console.log("[Create] Response data keys:", Object.keys(data), "result length:", data.result?.length ?? 0)
       setResult(data)
     } catch (error) {
-      console.error("Generation error:", error)
+      console.error("[Create] Generation error:", error)
     } finally {
       setIsLoading(false)
     }

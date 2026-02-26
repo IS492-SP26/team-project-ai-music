@@ -42,3 +42,8 @@ export interface GenerationResult {
   beatStructure: BeatStructure
   learning: LearningExplanation
 }
+
+/** Response from /api/generate when using Groq (plain text result) */
+export interface GenerateGroqResponse {
+  result: string
+}
