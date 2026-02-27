@@ -4,7 +4,7 @@ These are the prompts we gave each tool:
 
 Prompt 1:
 
-  Generate a beginner-friendly song plan about “sunsets and happy people.”
+  Generate a 10 line beginner-friendly song plan about “sunsets and happy people.”
   
   Requirements:
   Use clearly labeled sections: Intro, Verse, Chorus, Verse 2, Bridge, Outro. Keep language simple and catchy.
@@ -25,7 +25,7 @@ Prompt 1:
 
 Prompt 2:
 
-  Create a beat plan for a nostalgic but uplifting song at exactly 92 BPM.
+  Create a 10 line beat plan for a nostalgic but uplifting song at exactly 92 BPM.
   
   Constraints: Use only these instruments: kick, snare/clap, hi-hat, bass, simple melody.
   
@@ -47,6 +47,8 @@ Prompt 3:
   Then output:
   An 8-bar table showing:
    Bar | Chord | Kick Pattern | Snare Pattern | Hi-Hat Pattern
+
+  Remember it should only be 10 lines
   
   Format the table clearly so it could be used to generate a MIDI file.
 
