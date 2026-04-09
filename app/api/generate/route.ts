@@ -1,5 +1,6 @@
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
+import { applyPromptTemplate, loadPromptFile, promptBodyAfterSeparator } from '@/lib/load-prompt'
 
 const EducationalBreakdownSchema = z.object({
   summary: z.string().describe('A 1-sentence recap of the vibe'),
@@ -11,6 +12,25 @@ const EducationalBreakdownSchema = z.object({
 
 export type EducationalBreakdown = z.infer<typeof EducationalBreakdownSchema>
 
+let cachedSystemPrompt: string | null = null
+let cachedUserTemplate: string | null = null
+
+function getSystemPrompt(): string {
+  if (!cachedSystemPrompt) {
+    cachedSystemPrompt = loadPromptFile('app/prompts/sonic-scholar-system.md').trim()
+  }
+  return cachedSystemPrompt
+}
+
+function getUserPromptTemplate(): string {
+  if (!cachedUserTemplate) {
+    cachedUserTemplate = promptBodyAfterSeparator(
+      loadPromptFile('app/prompts/educational-breakdown-user.template.md')
+    )
+  }
+  return cachedUserTemplate
+}
+
 export async function POST(req: Request) {
   const body = await req.json()
   const { prompt, mood, instruments, bpm, melody, bassline, drumPattern, excitement, vibe } = body
@@ -21,36 +41,18 @@ export async function POST(req: Request) {
       : 50
   const safeVibe = typeof vibe === 'string' && vibe.trim() ? vibe.trim().toLowerCase() : 'default'
 
-  const systemPrompt = `You are the "Sonic Scholar" AI - a friendly music education assistant. Your mission is to explain music concepts to beginners using simple language and helpful analogies.
-
-Use analogies like:
-- "The bass is the floor of the room"
-- "The BPM is the heartbeat of the track"
-- "The melody is like the voice telling the story"
-- "The drums are the skeleton that holds everything together"
-
-IMPORTANT: Use very simple, easy-to-understand language. Avoid academic jargon. Be encouraging and make music production feel accessible.`
-
-  const userPrompt = `Generate a beginner-friendly educational breakdown for a music track with these settings:
-
-**User's Creative Vision:** "${prompt}"
-**Mood:** ${mood}
-**Instruments:** ${safeInstruments.join(', ')}
-**BPM:** ${bpm}
-**Excitement / Intensity:** ${safeExcitement} (0 calm → 100 intense)
-**Vibe / Sound space:** ${safeVibe}
-**Melody Style:** ${melody}
-**Bassline Style:** ${bassline}
-**Drum Pattern:** ${drumPattern}
-
-Create an educational breakdown that explains:
-1. A quick vibe summary
-2. How the ${bpm} BPM and ${drumPattern} drum pattern create the energy
-3. How excitement at ${safeExcitement} changes how "busy" and punchy the track feels (without only talking about speed)
-4. How the "${safeVibe}" vibe changes the sense of space and texture (washy vs tight, bright vs dark)
-5. How the ${bassline} bassline and ${melody} melody work together
-6. How the instruments (${safeInstruments.join(', ')}) achieve the ${mood} mood
-7. A fun production tip for beginners`
+  const systemPrompt = getSystemPrompt()
+  const userPrompt = applyPromptTemplate(getUserPromptTemplate(), {
+    prompt: typeof prompt === 'string' ? prompt : '',
+    mood: String(mood ?? ''),
+    instruments: safeInstruments.join(', '),
+    bpm: String(bpm ?? 120),
+    safeExcitement,
+    safeVibe,
+    melody: String(melody ?? ''),
+    bassline: String(bassline ?? ''),
+    drumPattern: String(drumPattern ?? ''),
+  })
 
   try {
     const { output } = await generateText({
@@ -85,16 +87,18 @@ Create an educational breakdown that explains:
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('[generate route] AI generation failed:', errorMessage)
-    
-    // Check for credit card requirement error
+
     if (errorMessage.includes('credit card') || errorMessage.includes('customer_verification_required')) {
-      return Response.json({
-        error: 'AI_GATEWAY_SETUP_REQUIRED',
-        message: 'To use AI features, please add a credit card to your Vercel account to unlock free credits.',
-        link: 'https://vercel.com/docs/ai-gateway'
-      }, { status: 403 })
+      return Response.json(
+        {
+          error: 'AI_GATEWAY_SETUP_REQUIRED',
+          message: 'To use AI features, please add a credit card to your Vercel account to unlock free credits.',
+          link: 'https://vercel.com/docs/ai-gateway',
+        },
+        { status: 403 }
+      )
     }
-    
+
     const fallbackEducational: EducationalBreakdown = {
       summary: `This sounds like a ${mood} track built around ${bpm} BPM with ${safeInstruments.join(', ') || 'a simple synth setup'}.`,
       rhythm_lesson: `At ${bpm} BPM, the track's pulse feels ${bpm < 90 ? 'relaxed' : bpm < 130 ? 'steady' : 'high-energy'}. The "${drumPattern}" pattern shapes how your head nods to that pulse. At excitement ${safeExcitement}, the groove feels ${safeExcitement < 35 ? 'spacious and soft' : safeExcitement < 70 ? 'balanced' : 'dense and upfront'}.`,
