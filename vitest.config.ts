@@ -7,7 +7,7 @@ const root = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['app/tests/**/*.test.ts'],
+    include: ['tests/**/*.test.ts'],
     testTimeout: 60_000,
   },
   resolve: {

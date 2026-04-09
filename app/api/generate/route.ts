@@ -1,6 +1,7 @@
 import { generateText, Output } from 'ai'
 import { z } from 'zod'
 import { applyPromptTemplate, loadPromptFile, promptBodyAfterSeparator } from '@/lib/load-prompt'
+import { getGenerateTextModelId } from '@/lib/model-config'
 
 const EducationalBreakdownSchema = z.object({
   summary: z.string().describe('A 1-sentence recap of the vibe'),
@@ -17,7 +18,7 @@ let cachedUserTemplate: string | null = null
 
 function getSystemPrompt(): string {
   if (!cachedSystemPrompt) {
-    cachedSystemPrompt = loadPromptFile('app/prompts/sonic-scholar-system.md').trim()
+    cachedSystemPrompt = loadPromptFile('prompts/sonic-scholar-system.md').trim()
   }
   return cachedSystemPrompt
 }
@@ -25,7 +26,7 @@ function getSystemPrompt(): string {
 function getUserPromptTemplate(): string {
   if (!cachedUserTemplate) {
     cachedUserTemplate = promptBodyAfterSeparator(
-      loadPromptFile('app/prompts/educational-breakdown-user.template.md')
+      loadPromptFile('prompts/educational-breakdown-user.template.md')
     )
   }
   return cachedUserTemplate
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
 
   try {
     const { output } = await generateText({
-      model: 'openai/gpt-4o-mini',
+      model: getGenerateTextModelId(),
       system: systemPrompt,
       prompt: userPrompt,
       output: Output.object({

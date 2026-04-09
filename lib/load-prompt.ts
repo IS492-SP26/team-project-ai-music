@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 /**
- * Load a UTF-8 prompt file from the repository root (e.g. `app/prompts/foo.md`).
+ * Load a UTF-8 prompt file from the repository root (e.g. `prompts/foo.md`).
  * Server-only — do not import from Client Components.
  */
 export function loadPromptFile(relativePathFromRepoRoot: string): string {
