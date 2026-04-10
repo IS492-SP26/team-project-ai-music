@@ -1,73 +1,91 @@
-# Safety & privacy
+# Safety & Privacy
 
-PII, **Supabase** storage, abuse controls, and prompt-injection mitigations for Sonic Scholar. Complements [telemetry.md](./telemetry.md).
-
----
-
-## 1. Personally identifiable information (PII)
-
-**Sources:** Free-text **creative prompt** (stored as `generations.description`); future accounts or support forms.
-
-**Practices**
-
-1. **Minimize** what is sent to the model (only what the lesson needs).
-2. **Treat `generations` as sensitive** — full prompts and lesson text are stored for analytics/support; restrict Supabase dashboard access and use **RLS** + least-privilege keys.
-3. **Redact** before any *additional* logging: emails, phones, payment-like patterns → `[REDACTED]` if you add log pipelines.
-4. **Compliance:** If you store EU user data, document lawful basis, retention, and deletion in your privacy policy; support **deletion/export** requests against `generations` if required.
+This doc explains how Sonic Scholar handles user data, Supabase storage, and protection against abuse or prompt injection. It works alongside `telemetry.md`.
 
 ---
 
-## 2. Supabase keys and RLS
+## 1. Personally Identifiable Information (PII)
+
+**Sources:**
+- User creative prompts (stored as `generations.description`)
+- Future features like accounts or support forms
+
+**Practices:**
+
+- Only send the **minimum data needed** to the model  
+- Treat the `generations` table as **sensitive** (it stores prompts and outputs)  
+- Restrict access using **RLS (Row Level Security)** and least-privilege keys  
+- Redact sensitive info (emails, phone numbers, etc.) → `[REDACTED]` if logging externally  
+- If storing EU data:
+  - Define data usage in a privacy policy  
+  - Support **data deletion/export requests**
+
+---
+
+## 2. Supabase Keys & Security
 
 | Key | Where | Role |
-|-----|--------|------|
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe | Subject to **RLS**; use policies if clients ever write directly. |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Server only** (`.env.local`, Vercel env) | **Bypasses RLS** — use only in `lib/supabaseServer.ts` / Route Handlers; **never** prefix with `NEXT_PUBLIC_` or commit to Git. |
+|-----|------|------|
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Frontend | Safe for browser use, controlled by RLS |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only | Full access (bypasses RLS) — keep private |
 
-**Recommended:** Use the **service role** for `insertGenerationServer` so inserts do not depend on fragile anon policies. If you only use the **anon** key on the server, you must run [`supabase-rls-and-grants.sql`](./supabase-rls-and-grants.sql) (`GRANT` + insert policy for `anon`).
+**Important:**
 
-Do **not** expose the service role to client bundles or public repos.
+- Never expose the service role key in client code or GitHub  
+- Never prefix it with `NEXT_PUBLIC_`  
+- Store it in `.env.local` or deployment environment variables  
 
----
-
-## 3. Rate limits & payload controls
-
-**Goals:** Limit cost and abuse on `POST /api/generate` and protect the database from spam inserts.
-
-**Strategies**
-
-- Edge / WAF: Vercel Firewall, Cloudflare, or **Upstash Redis** sliding window per IP or user.
-- **Body size cap** and **prompt length cap** server-side before the LLM call and before insert.
-- **Idempotency-Key** header for safe retries (optional).
-- Optional: throttle rows per IP/user into `generations` via Edge middleware or Supabase **Edge Functions** (future).
+**Recommended:**
+- Use the **service role key** for server-side inserts (`insertGenerationServer`)  
+- If using only the anon key, make sure proper RLS policies are set up  
 
 ---
 
-## 4. Jailbreak & prompt injection
+## 3. Rate Limits & Abuse Prevention
 
-User text is embedded in the **user** message; attackers may try to override the system role.
+**Goal:** Prevent spam and control costs
 
-**Mitigations (aligned with `prompts/sonic-scholar-system.md`)**
+**Strategies:**
 
-1. **Role anchoring:** “Sonic Scholar” for music education only.
-2. **Refusal:** Ignore requests to reveal system text, change role, or leave topic.
-3. **Structured output:** Zod-validated object reduces free-form exfiltration.
-4. **Server-side templates:** Authoritative system copy lives in **`prompts/`**, version-controlled.
-
-**Stored output:** Lesson fields in `generations` reflect model output; monitor for abuse patterns if exposing data downstream.
-
----
-
-## 5. Change management
-
-- Prompt changes: review in PR; tag releases when `prompts/` affects behavior.
-- Model changes: update `config/model.json`; run `npm run test` and manual `/api/generate` checks.
-- Schema changes: migrate `generations` in Supabase and update `lib/log-generation.ts` + SQL docs under `docs/supabase-*.sql`.
+- Add rate limiting (per IP/user) using:
+  - Vercel Firewall  
+  - Cloudflare  
+  - Upstash Redis  
+- Limit request body size and prompt length  
+- (Optional) Use an `Idempotency-Key` header for retries  
+- Optionally limit how many rows a user/IP can insert into `generations`
 
 ---
 
-## Related docs
+## 4. Prompt Injection & Jailbreaks
 
-- [architecture.md](./architecture.md)  
-- [use-cases.md](./use-cases.md)  
-- [INSTALL.md](../INSTALL.md)  
+User input is passed into the model, so it can be abused.
+
+**Protections:**
+
+- Keep a strict system role (Sonic Scholar = music education only)  
+- Ignore requests to:
+  - Reveal system prompts  
+  - Change roles  
+  - Go off-topic  
+- Use structured outputs (Zod validation) instead of free text  
+- Store system prompts in `prompts/` (server-side, version-controlled)
+
+**Note:**
+- Outputs are stored in `generations`, so monitor for abuse if reused elsewhere  
+
+---
+
+## 5. Change Management
+
+- **Prompt changes:** Review in PRs and track updates in `prompts/`  
+- **Model changes:** Update `config/model.json` and test  
+- **Database changes:** Update Supabase schema and related files (`log-generation.ts`, SQL docs)
+
+---
+
+## Related Docs
+
+- `architecture.md`  
+- `use-cases.md`  
+- `INSTALL.md`
