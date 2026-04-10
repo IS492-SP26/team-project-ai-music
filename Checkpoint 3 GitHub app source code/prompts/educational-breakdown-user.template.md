@@ -1,27 +1,46 @@
-# Educational breakdown — user message template
+# Educational Breakdown — Simple Version
 
-Documentation only (not sent to the model). Placeholders: `{{prompt}}`, `{{mood}}`, `{{instruments}}`, `{{bpm}}`, `{{safeExcitement}}`, `{{safeVibe}}`, `{{melody}}`, `{{bassline}}`, `{{drumPattern}}`.
+This is just a template to guide what the explanation should include. It is not sent to the model.
 
 ---
 
-Generate a beginner-friendly educational breakdown for a music track with these settings:
+Create a **beginner-friendly explanation** for a music track using these settings:
 
-**User's Creative Vision:** "{{prompt}}"
-**Mood:** {{mood}}
-**Instruments:** {{instruments}}
-**BPM:** {{bpm}}
-**Excitement / Intensity:** {{safeExcitement}} (0 calm → 100 intense)
-**Vibe / Sound space:** {{safeVibe}}
-**Melody Style:** {{melody}}
-**Bassline Style:** {{bassline}}
-**Drum Pattern:** {{drumPattern}}
+- **Creative Idea:** "{{prompt}}"
+- **Mood:** {{mood}}
+- **Instruments:** {{instruments}}
+- **BPM:** {{bpm}}
+- **Energy Level:** {{safeExcitement}} (0 = calm, 100 = very intense)
+- **Vibe:** {{safeVibe}}
+- **Melody Style:** {{melody}}
+- **Bassline Style:** {{bassline}}
+- **Drum Pattern:** {{drumPattern}}
 
-Create an educational breakdown that explains:
+---
 
-1. A quick vibe summary
-2. How the {{bpm}} BPM and {{drumPattern}} drum pattern create the energy
-3. How excitement at {{safeExcitement}} changes how "busy" and punchy the track feels (without only talking about speed)
-4. How the "{{safeVibe}}" vibe changes the sense of space and texture (washy vs tight, bright vs dark)
-5. How the {{bassline}} bassline and {{melody}} melody work together
-6. How the instruments ({{instruments}}) achieve the {{mood}} mood
-7. A fun production tip for beginners
+### What to Explain
+
+Keep it simple and easy to understand. Cover these points:
+
+1. **Overall vibe**  
+   What does the track feel like?
+
+2. **Rhythm and energy**  
+   How do the BPM ({{bpm}}) and drum pattern ({{drumPattern}}) affect the energy?
+
+3. **Energy level (excitement)**  
+   How does {{safeExcitement}} change how busy or punchy the track feels?  
+   (Not just faster or slower)
+
+4. **Vibe / sound space**  
+   How does "{{safeVibe}}" affect the sound?  
+   For example: wide vs tight, bright vs dark
+
+5. **Melody and bassline**  
+   How do the {{melody}} melody and {{bassline}} bassline work together?
+
+6. **Instruments and mood**  
+   How do the instruments ({{instruments}}) create the {{mood}} feeling?
+
+7. **Beginner tip**  
+   Give one simple and useful production tip
