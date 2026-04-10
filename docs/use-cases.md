@@ -1,6 +1,6 @@
 # Critical user paths — Sonic Scholar
 
-These flows define product value. Keep them stable in UI, API, and tests.
+These flows define product value. Keep them stable in UI, API, database, and tests.
 
 ---
 
@@ -55,6 +55,20 @@ These flows define product value. Keep them stable in UI, API, and tests.
 
 ---
 
+## 6. Persist generation to the backend (Supabase)
+
+**Actor:** Same as (1) or (2) when the API returns a full `educational` object.
+
+**Goal:** One row in **`public.generations`** per successful response path (AI or fallback), capturing user inputs and structured lesson fields.
+
+**Steps:** Server runs **`insertGenerationServer`** from `lib/log-generation.ts` after building the response.
+
+**Success criteria:** New row visible in Supabase **Table Editor** → `generations`; terminal may log `[Supabase] generations row inserted ok`.
+
+**Failure cues:** `[Supabase] generations insert failed` in the server terminal — fix env (`SUPABASE_SERVICE_ROLE_KEY` or RLS SQL). See [INSTALL.md](../INSTALL.md).
+
+---
+
 ## Automated tests (minimal coverage)
 
 | Use case | How we test | File |
@@ -63,6 +77,6 @@ These flows define product value. Keep them stable in UI, API, and tests.
 
 **Run:** `npm run test` from the repository root.
 
-**Not covered in-repo (add when needed):** Playwright/Cypress e2e for (3) and (4) (Web Audio + gestures); contract tests against a mocked LLM.
+**Not covered in-repo (add when needed):** Playwright/Cypress e2e for (3) and (4) (Web Audio + gestures); integration test with a mocked Supabase client for (6); contract tests against a mocked LLM.
 
 **Debugging failures:** See [telemetry.md](./telemetry.md#debugging-test-runs-and-local-ci).

@@ -2,6 +2,7 @@ import { generateText, Output } from 'ai'
 import { z } from 'zod'
 import { applyPromptTemplate, loadPromptFile, promptBodyAfterSeparator } from '@/lib/load-prompt'
 import { getGenerateTextModelId } from '@/lib/model-config'
+import { insertGenerationServer, type GenerationSettings } from '@/lib/log-generation'
 
 const EducationalBreakdownSchema = z.object({
   summary: z.string().describe('A 1-sentence recap of the vibe'),
@@ -67,22 +68,26 @@ export async function POST(req: Request) {
 
     console.log('[v0] AI output:', JSON.stringify(output, null, 2))
 
+    const settingsPayload: GenerationSettings = {
+      prompt: typeof prompt === 'string' ? prompt : '',
+      mood: String(mood ?? ''),
+      instruments: safeInstruments,
+      bpm: typeof bpm === 'number' && Number.isFinite(bpm) ? bpm : 120,
+      melody: String(melody ?? ''),
+      bassline: String(bassline ?? ''),
+      drumPattern: String(drumPattern ?? ''),
+      excitement: safeExcitement,
+      vibe: safeVibe,
+    }
+
     const responseData = {
       educational: output,
-      settings: {
-        prompt,
-        mood,
-        instruments: safeInstruments,
-        bpm,
-        melody,
-        bassline,
-        drumPattern,
-        excitement: safeExcitement,
-        vibe: safeVibe,
-      },
+      settings: settingsPayload,
     }
 
     console.log('[v0] Sending response:', JSON.stringify(responseData, null, 2))
+
+    void insertGenerationServer(settingsPayload, output)
 
     return Response.json(responseData)
   } catch (error: unknown) {
@@ -108,19 +113,23 @@ export async function POST(req: Request) {
       fun_fact: 'Producer tip: if your track feels crowded, mute one element at a time and keep only the parts that you truly miss.',
     }
 
+    const fallbackSettings: GenerationSettings = {
+      prompt: typeof prompt === 'string' ? prompt : '',
+      mood: String(mood ?? ''),
+      instruments: safeInstruments,
+      bpm: typeof bpm === 'number' && Number.isFinite(bpm) ? bpm : 120,
+      melody: String(melody ?? ''),
+      bassline: String(bassline ?? ''),
+      drumPattern: String(drumPattern ?? ''),
+      excitement: safeExcitement,
+      vibe: safeVibe,
+    }
+
+    void insertGenerationServer(fallbackSettings, fallbackEducational)
+
     return Response.json({
       educational: fallbackEducational,
-      settings: {
-        prompt,
-        mood,
-        instruments: safeInstruments,
-        bpm,
-        melody,
-        bassline,
-        drumPattern,
-        excitement: safeExcitement,
-        vibe: safeVibe,
-      },
+      settings: fallbackSettings,
       warning: 'AI provider unavailable. Showing local fallback educational breakdown.',
     })
   }
