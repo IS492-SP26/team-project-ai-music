@@ -1,14 +1,22 @@
-# Sonic Scholar — Installation & Runbook
+# Beat AI — Installation & Runbook
 
-Next.js 16 (App Router), TypeScript, Tailwind CSS, an AI-backed `POST /api/generate` route, and **Supabase** (`public.generations`) for persisting each successful generation.
+This project uses Next.js 16 (App Router), TypeScript, Tailwind CSS, an AI-powered `POST /api/generate` route, and Supabase to store generated results in `public.generations`.
+
+---
 
 ## Prerequisites
 
-- **Node.js** 20.x or 22.x (LTS recommended)
-- **npm** or **pnpm** (both lockfiles may exist; pick one package manager and stick with it)
-- **Supabase project** (for database storage) — [supabase.com](https://supabase.com)
+Make sure you have:
 
-## Clone & install
+- Node.js (version 20 or 22 recommended)
+- npm or pnpm (just pick one and stick with it)
+- A Supabase project (https://supabase.com)
+
+---
+
+## Clone and Install
+
+Run the following in your terminal:
 
 ```bash
 git clone <your-repository-url>
@@ -16,9 +24,11 @@ cd <repository-directory>
 npm install
 ```
 
-## Environment
+---
 
-Copy the example file (no secrets committed) to the project root:
+## Set Up Environment Variables
+
+Copy the example file:
 
 ```bash
 cp .env.example .env.local
@@ -30,82 +40,119 @@ On Windows (PowerShell):
 Copy-Item .env.example .env.local
 ```
 
-Fill in values in **`.env.local`** (see [.env.example](./.env.example)):
+Then open `.env.local` and fill in the values.
 
-| Area | Variables |
-|------|-----------|
-| AI | `AI_GATEWAY_API_KEY` (optional locally; Vercel OIDC may apply on deploy) |
-| Supabase | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| Supabase server writes | **`SUPABASE_SERVICE_ROLE_KEY`** (recommended) — Dashboard → **Settings → API → service_role** (never expose to the browser; never commit) |
+### What you need to add:
 
-**Database setup:** In the Supabase **SQL Editor**, run the scripts in order as needed:
+- AI (optional for local testing):
+  - `AI_GATEWAY_API_KEY`
 
-- [`docs/supabase-generations.sql`](./docs/supabase-generations.sql) — create `generations` + RLS + grants  
-- [`docs/supabase-fix-missing-lesson-columns.sql`](./docs/supabase-fix-missing-lesson-columns.sql) — add lesson columns if upgrading an older table  
-- [`docs/supabase-rls-and-grants.sql`](./docs/supabase-rls-and-grants.sql) — if inserts fail with RLS **42501** and you only use the anon key  
+- Supabase (required):
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-After changing `.env.local`, **restart** the dev server so Next.js picks up env vars.
+- Supabase server access (recommended):
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - Find this in Supabase → Settings → API → service_role  
+  - Do NOT expose this key in the frontend or commit it to GitHub
 
-## Run scripts (`package.json`)
+After editing `.env.local`, restart your dev server.
 
-| Command | Description |
-|--------|-------------|
-| `npm run dev` | Development server (Turbopack) |
-| `npm run build` | Production build |
-| `npm run start` | Serve production build (after `build`) |
-| `npm run lint` | ESLint (`eslint .`) |
-| `npm run test` | Vitest — minimal tests under `tests/` |
-| `npm run test:watch` | Vitest watch mode |
+---
 
-If `lint` fails with “eslint not recognized”, install ESLint as a dev dependency or run `npx eslint .`.
+## Database Setup (Supabase)
 
-## Run locally
+Go to the Supabase SQL Editor and run these files if needed:
+
+- `docs/supabase-generations.sql`  
+  Creates the `generations` table and sets up permissions  
+
+- `docs/supabase-fix-missing-lesson-columns.sql`  
+  Adds missing columns if you are upgrading  
+
+- `docs/supabase-rls-and-grants.sql`  
+  Use this if you get permission errors (RLS 42501)
+
+---
+
+## Running the App
+
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Then open:
 
-## Production
+http://localhost:3000
+
+---
+
+## Build for Production
 
 ```bash
 npm run build
 npm run start
 ```
 
-## Deploy (Vercel)
+---
 
-1. Connect the repository.
-2. Set environment variables to match `.env.example` (including Supabase and, for reliable inserts, **`SUPABASE_SERVICE_ROLE_KEY`**).
-3. Default build: `next build`.
+## Deploying (Vercel)
 
-## Verify tests
+1. Connect your repo to Vercel  
+2. Add the same environment variables from `.env.local`  
+3. Include `SUPABASE_SERVICE_ROLE_KEY` for database writes  
+4. Use the default build command: `next build`
+
+---
+
+## Running Tests
 
 ```bash
 npm run test
 ```
 
-## Repository layout (high level)
+---
 
-| Path | Purpose |
-|------|---------|
-| `app/` | Next.js routes and UI entry |
-| `prompts/` | System and user LLM templates |
-| `config/` | Model id (`model.json`) and data-connector notes |
-| `lib/` | Audio, prompts, model config, **Supabase server client**, **generation logging** |
-| `docs/` | Architecture, use cases, telemetry, safety, **Supabase SQL** |
-| `tests/` | Critical-path unit/smoke tests |
+## Project Structure (Simple Overview)
 
-## Documentation
+- `app/` → Main app pages and API routes  
+- `prompts/` → AI prompt templates  
+- `config/` → Model settings  
+- `lib/` → Helper functions (Supabase, logging, audio, etc.)  
+- `docs/` → Documentation and SQL setup files  
+- `tests/` → Basic tests  
 
-- [docs/architecture.md](./docs/architecture.md) — stack, diagram, data flow (including Supabase)  
-- [docs/use-cases.md](./docs/use-cases.md) — user paths and test mapping  
-- [docs/telemetry.md](./docs/telemetry.md) — logging, `generations` table, debugging tests  
-- [docs/safety-and-privacy.md](./docs/safety-and-privacy.md) — PII, RLS, rate limits, abuse  
+---
+
+## Helpful Docs
+
+- `docs/architecture.md` → How everything connects  
+- `docs/use-cases.md` → Main user flows  
+- `docs/telemetry.md` → Logging and debugging  
+- `docs/safety-and-privacy.md` → Data handling and security  
+
+---
 
 ## Troubleshooting
 
-- **AI / Gateway errors:** Configure billing or `AI_GATEWAY_API_KEY` per [Vercel AI Gateway](https://vercel.com/docs/ai-gateway); the API may return a local fallback when the provider fails (except some 403 setup cases).
-- **Supabase insert errors:** Check the terminal for `[Supabase] generations insert failed`. Common fixes: add **`SUPABASE_SERVICE_ROLE_KEY`**, or run [`docs/supabase-rls-and-grants.sql`](./docs/supabase-rls-and-grants.sql), or ensure lesson columns exist ([`docs/supabase-fix-missing-lesson-columns.sql`](./docs/supabase-fix-missing-lesson-columns.sql)).
-- **Silent audio previews:** Add mapped samples under `public/assets/audio/` (see `lib/audio-sample-map.ts`) or use the Web Audio fallback.
+AI not working:
+- Make sure billing or `AI_GATEWAY_API_KEY` is set up  
+- The app may return a fallback response if AI fails  
+
+Supabase not saving data:
+- Check terminal for:
+  ```
+  [Supabase] generations insert failed
+  ```
+- Fixes:
+  - Add `SUPABASE_SERVICE_ROLE_KEY`
+  - Run the RLS SQL file
+  - Make sure all columns exist  
+
+Audio not playing:
+- Add audio files to `public/assets/audio/`  
+- Or use the Web Audio fallback  
+
+---
