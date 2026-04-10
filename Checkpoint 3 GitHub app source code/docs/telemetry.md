@@ -1,6 +1,6 @@
 # Telemetry & Observability Plan
 
-This explains how Sonic Scholar logs data, saves generations in Supabase, and how to debug issues when running locally or testing.
+This explains how BeatAI logs data, saves generations in Supabase, and how to debug issues when running locally or testing.
 
 ---
 
