@@ -1,4 +1,4 @@
-# Critical User Paths — Sonic Scholar
+# Critical User Paths — BeatAI
 
 These are the main flows that actually matter for the product. If these break, the app basically doesn’t work. So anything we change in the UI, API, or database should not mess these up.
 
