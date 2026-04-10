@@ -1,4 +1,4 @@
-# Architecture — Sonic Scholar
+# Architecture — BeatAI
 
 ![High-level system diagram](./architecture.png)
 
