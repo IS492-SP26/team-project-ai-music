@@ -4,7 +4,7 @@
 
 ## Overview
 
-Sonic Scholar is a **music education** web app: users configure a synthetic track, request an **AI-generated educational breakdown**, preview **browser-generated audio** (Web Audio API), and each successful generation is **persisted** to **Supabase Postgres** (`public.generations`). Deployment targets **Vercel** and the **Next.js App Router**.
+BeatAI is a **music education** web app: users configure a synthetic track, request an **AI-generated educational breakdown**, preview **browser-generated audio** (Web Audio API), and each successful generation is **persisted** to **Supabase Postgres** (`public.generations`). Deployment targets **Vercel** and the **Next.js App Router**.
 
 ## Tech stack
 
