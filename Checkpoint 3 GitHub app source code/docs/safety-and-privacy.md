@@ -1,6 +1,6 @@
 # Safety & Privacy
 
-This doc explains how Sonic Scholar handles user data, Supabase storage, and protection against abuse or prompt injection. It works alongside `telemetry.md`.
+This doc explains how BeatAI handles user data, Supabase storage, and protection against abuse or prompt injection. It works alongside `telemetry.md`.
 
 ---
 
