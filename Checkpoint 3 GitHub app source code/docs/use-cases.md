@@ -1,82 +1,143 @@
-# Critical user paths — Sonic Scholar
+# Critical User Paths — Sonic Scholar
 
-These flows define product value. Keep them stable in UI, API, database, and tests.
-
----
-
-## 1. Configure and generate a lesson
-
-**Actor:** Learner / creator  
-**Goal:** Personalized music-theory explanation for the chosen configuration.
-
-**Steps:** Open app → enter creative prompt → set mood, vibe, instruments, BPM, excitement, melody, bassline, drums → **Generate Music & Learn** → receive `educational` JSON (AI or fallback) and breakdown UI.
-
-**Success criteria:** `educational.summary` and related fields present; `settings` echo submission.
+These are the main flows that actually matter for the product. If these break, the app basically doesn’t work. So anything we change in the UI, API, or database should not mess these up.
 
 ---
 
-## 2. Recover when AI is unavailable
+## 1. Configure and Generate a Lesson
 
-**Actor:** Same as (1), with missing or misconfigured AI.
+**Who:** User (learner / creator)  
+**Goal:** Get a personalized music theory explanation based on their inputs  
 
-**Steps:** Same form → API fails (network, quota, unauthenticated gateway).
+**Flow:**
+- Open the app  
+- Enter a creative prompt  
+- Choose settings (mood, vibe, instruments, BPM, excitement, melody, bassline, drums)  
+- Click **Generate Music & Learn**  
+- Get a lesson (`educational` JSON) and see it in the UI  
 
-**Success criteria:** Fallback lesson (`warning` allowed); no uncaught client error; 403 setup path when applicable.
-
----
-
-## 3. Preview option sounds before generating
-
-**Actor:** User exploring controls.
-
-**Steps:** Use headphone preview on a control → short demo (file from `public/assets/audio/` or Web Audio fallback).
-
-**Success criteria:** Audio plays; no console spam on missing files.
+**What success looks like:**
+- `educational.summary` and other fields show up  
+- The settings in the response match what the user selected  
 
 ---
 
-## 4. Play the full soundscape
+## 2. Handle AI Failures (Fallback)
 
-**Actor:** User after a successful generate.
+**Who:** Same user, but AI isn’t working  
 
-**Steps:** Use main **Play** on the audio player → multi-layer preview from settings + prompt-derived seed.
+**Flow:**
+- User fills out the form like normal  
+- API call fails (bad key, network issue, quota, etc.)  
 
-**Success criteria:** Playback on user gesture; stop works; layers reflect mood/BPM/vibe/excitement.
-
----
-
-## 5. Gateway billing / setup (production)
-
-**Actor:** Maintainer on Vercel.
-
-**Steps:** Deploy without Gateway billing verification → trigger generate.
-
-**Success criteria:** **403** with `AI_GATEWAY_SETUP_REQUIRED` and `link`; UI can show error state (`app/page.tsx`).
+**What success looks like:**
+- User still gets a fallback lesson  
+- App doesn’t crash  
+- A warning is okay  
+- If needed, show a 403 setup error  
 
 ---
 
-## 6. Persist generation to the backend (Supabase)
+## 3. Preview Sounds Before Generating
 
-**Actor:** Same as (1) or (2) when the API returns a full `educational` object.
+**Who:** User exploring options  
 
-**Goal:** One row in **`public.generations`** per successful response path (AI or fallback), capturing user inputs and structured lesson fields.
+**Flow:**
+- Click headphone preview on a setting  
+- Play a short demo sound  
 
-**Steps:** Server runs **`insertGenerationServer`** from `lib/log-generation.ts` after building the response.
-
-**Success criteria:** New row visible in Supabase **Table Editor** → `generations`; terminal may log `[Supabase] generations row inserted ok`.
-
-**Failure cues:** `[Supabase] generations insert failed` in the server terminal — fix env (`SUPABASE_SERVICE_ROLE_KEY` or RLS SQL). See [INSTALL.md](../INSTALL.md).
+**What success looks like:**
+- Audio plays  
+- No console errors if a file is missing  
+- Uses files from `public/assets/audio/` or fallback audio  
 
 ---
 
-## Automated tests (minimal coverage)
+## 4. Play the Full Soundscape
+
+**Who:** User after generating a lesson  
+
+**Flow:**
+- Click the main **Play** button  
+- Hear a layered sound based on their inputs  
+
+**What success looks like:**
+- Audio plays when user clicks  
+- Stop button works  
+- Sound reflects mood, BPM, vibe, etc.  
+
+---
+
+## 5. Gateway Setup / Billing (Production)
+
+**Who:** Developer / maintainer  
+
+**Flow:**
+- Deploy app without setting up AI Gateway billing  
+- Try to generate  
+
+**What success looks like:**
+- App returns a **403 error**  
+- Error includes `AI_GATEWAY_SETUP_REQUIRED` and a link  
+- UI shows a clear error state  
+
+---
+
+## 6. Save Generations to Supabase
+
+**Who:** Any user who generates a lesson  
+
+**Goal:** Save one row per generation in the database  
+
+**Flow:**
+- After generating (AI or fallback), server runs `insertGenerationServer`  
+- Data is saved in `public.generations`  
+
+**What success looks like:**
+- New row appears in Supabase Table Editor  
+- Terminal shows:
+
+- **If something breaks:**
+- You’ll see:
+
+[Supabase] generations insert failed
+
+- Usually means:
+- Missing `SUPABASE_SERVICE_ROLE_KEY`  
+- RLS not set up properly  
+- Check `INSTALL.md` for fixes  
+
+---
+
+## Tests (Basic Coverage)
 
 | Use case | How we test | File |
-|----------|-------------|------|
-| **1 + 2** (happy path + fallback) | `POST` handler with valid JSON; assert JSON shape and `educational` fields; allow **403** for gateway setup | [`tests/api/generate.smoke.test.ts`](../tests/api/generate.smoke.test.ts) |
+|----------|------------|------|
+| 1 + 2 (normal + fallback) | Send POST request, check response structure, allow 403 if needed | `tests/api/generate.smoke.test.ts` |
 
-**Run:** `npm run test` from the repository root.
+**Run tests:**
 
-**Not covered in-repo (add when needed):** Playwright/Cypress e2e for (3) and (4) (Web Audio + gestures); integration test with a mocked Supabase client for (6); contract tests against a mocked LLM.
+npm run test
 
-**Debugging failures:** See [telemetry.md](./telemetry.md#debugging-test-runs-and-local-ci).
+
+---
+
+## Not Covered (Yet)
+
+- End-to-end tests (Playwright/Cypress) for audio features  
+- Supabase integration tests (could mock client)  
+- Mocked LLM contract tests  
+
+---
+
+## Debugging
+
+If something fails, check:
+- `telemetry.md` (especially debugging section)  
+- Server logs  
+- Supabase logs  
+
+Most issues come down to:
+- Missing environment variables  
+- API keys not set  
+- RLS blocking database inserts  
