@@ -97,8 +97,7 @@ These are the main flows that actually matter for the product. If these break, t
 - New row appears in Supabase Table Editor  
 - Terminal shows:
 
-- **If something breaks:**
-- You’ll see:
+**If something breaks:** You’ll see:
 
 [Supabase] generations insert failed
 
