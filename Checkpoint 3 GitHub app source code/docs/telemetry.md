@@ -1,79 +1,121 @@
-# Telemetry & observability plan
+# Telemetry & Observability Plan
 
-How Sonic Scholar **logs**, **persists generations in Supabase**, and how to **debug** tests and local runs.
+This explains how Sonic Scholar logs data, saves generations in Supabase, and how to debug issues when running locally or testing.
 
 ---
 
-## 1. Runtime logging (application)
+## 1. Runtime Logging (Application)
 
-**Where:** `app/api/generate/route.ts` (`try` / `catch`), `lib/log-generation.ts` (Supabase errors).
+**Where logging happens:**
+- `app/api/generate/route.ts` (inside try/catch)
+- `lib/log-generation.ts` (Supabase insert errors)
 
-**Principles:**
+**Basic rules:**
 
-- Structured fields where possible; avoid logging full request bodies in production.
-- Never log **`SUPABASE_SERVICE_ROLE_KEY`**, `AI_GATEWAY_API_KEY`, cookies, or session tokens.
+- Keep logs simple and readable  
+- Do not log full request bodies in production  
+- Never log sensitive info like:
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `AI_GATEWAY_API_KEY`
+  - cookies or session tokens  
 
-**Console (dev / server)**
+**Common console logs:**
 
 | Message | Meaning |
-|---------|---------|
-| `[v0] AI output:` | Structured LLM result (trim noise in production). |
-| `[generate route] AI generation failed:` | AI path threw; fallback may still return. |
-| `[Supabase] generations row inserted ok` | Row written to `public.generations`. |
-| `[Supabase] generations insert failed:` | DB/RLS/schema issue — see message, `code`, `details`. |
-| `[Supabase] Insert skipped:` | Missing `NEXT_PUBLIC_SUPABASE_*` env. |
-| RLS **42501** hint | Add `SUPABASE_SERVICE_ROLE_KEY` or run [`supabase-rls-and-grants.sql`](./supabase-rls-and-grants.sql). |
+|--------|--------|
+| `[v0] AI output:` | AI result (can be messy, mostly for debugging) |
+| `[generate route] AI generation failed:` | AI request failed, fallback might still work |
+| `[Supabase] generations row inserted ok` | Data saved successfully |
+| `[Supabase] generations insert failed:` | Problem with database, RLS, or schema |
+| `[Supabase] Insert skipped:` | Missing Supabase environment variables |
+| RLS **42501** | Permission issue, usually fix by using service role or running SQL setup |
 
-**Optional vendors:** Vercel Runtime Logs, Sentry (`SENTRY_DSN` in `.env.example`).
-
----
-
-## 2. Database: `public.generations` (implemented)
-
-**Purpose:** Audit what users submitted and what the model (or fallback) returned, for product analytics and support.
-
-**When:** After each successful `POST /api/generate` response that includes `educational` — both **live AI** and **local fallback** paths call `insertGenerationServer`.
-
-**Implementation:** `lib/log-generation.ts` → `getSupabaseServerClient()` in `lib/supabaseServer.ts` (prefers **`SUPABASE_SERVICE_ROLE_KEY`** so RLS does not block server inserts).
-
-**Columns (logical)**
-
-| Column | Content |
-|--------|---------|
-| `description` | User creative prompt (`prompt`) |
-| `mood`, `vibe`, `instruments`, `bpm`, `excitement` | Settings |
-| `melody_style`, `bassline_style`, `drum_pattern` | Settings |
-| `track_vibe`, `rhythm_energy`, `harmony_structure`, `instrument_magic`, `pro_tip` | AI lesson sections (UI-aligned) |
-| `model_explanation` | Legacy nullable column; app sends **`null`** (structured columns hold text) |
-| `created_at` | Server timestamp (DB default) |
-
-**Schema / RLS SQL:** [`supabase-generations.sql`](./supabase-generations.sql), [`supabase-rls-and-grants.sql`](./supabase-rls-and-grants.sql), [`supabase-fix-missing-lesson-columns.sql`](./supabase-fix-missing-lesson-columns.sql).
-
-**Viewing data:** Supabase **Table Editor** → `generations`, or **SQL Editor** → `select * from public.generations order by created_at desc limit 50;`.
+**Optional tools:**
+- Vercel logs  
+- Sentry (if configured)
 
 ---
 
-## 3. Debugging test runs and local CI
+## 2. Database: `public.generations`
 
-**Symptom:** Vitest logs `Unauthenticated request to AI Gateway` during `tests/api/generate.smoke.test.ts`.
+**Why we store this:**
+We save what the user entered and what the AI returned so we can debug problems and understand usage.
 
-**Meaning:** Expected when `AI_GATEWAY_API_KEY` is unset; the route **catches** the error and returns **200** with a **fallback** `educational` payload. The test asserts shape, not live AI.
+**When data is saved:**
+- After every successful `POST /api/generate`
+- Works for both real AI responses and fallback responses  
 
-**Supabase during tests:** If `.env.local` is not loaded in Vitest, you may see `[Supabase] Insert skipped`. That does not fail the smoke test. To test DB inserts in CI, use a dedicated Supabase project or mock the client — not required for the current smoke test.
+**How it works:**
+- `lib/log-generation.ts` handles inserts  
+- Uses `getSupabaseServerClient()` from `lib/supabaseServer.ts`  
+- Best practice is to use `SUPABASE_SERVICE_ROLE_KEY` so inserts are not blocked  
 
-**How to debug**
+**Main columns:**
 
-1. Run `npm run test` and confirm **1 passed** (or early exit on 403 setup branch).
-2. For **real AI** locally, set `AI_GATEWAY_API_KEY` in `.env.local` and restart `npm run dev`.
-3. For **Supabase inserts**, set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and preferably **`SUPABASE_SERVICE_ROLE_KEY`**; restart dev; trigger generate and watch the terminal for `[Supabase] generations row inserted ok`.
-4. **403 / billing:** Deploy or adjust Vercel AI Gateway billing; inspect JSON `error`, `link`.
+| Column | What it stores |
+|--------|---------------|
+| `description` | User prompt |
+| `mood`, `vibe`, `instruments`, `bpm`, `excitement` | User settings |
+| `melody_style`, `bassline_style`, `drum_pattern` | More settings |
+| `track_vibe`, `rhythm_energy`, `harmony_structure`, `instrument_magic`, `pro_tip` | AI-generated lesson content |
+| `model_explanation` | Not used (set to null) |
+| `created_at` | Timestamp |
 
-**Client-side:** Web Audio issues rarely appear in Vitest; use browser DevTools.
+**SQL files:**
+- `supabase-generations.sql`  
+- `supabase-rls-and-grants.sql`  
+- `supabase-fix-missing-lesson-columns.sql`  
 
----
+**How to view data:**
+- Supabase Table Editor → `generations`  
+- Or run:
+  ```sql
+  select * from public.generations order by created_at desc limit 50;
 
-## Related
+  3. Debugging Tests and Local Runs
 
-- [safety-and-privacy.md](./safety-and-privacy.md) — PII in `generations`, RLS  
-- [architecture.md](./architecture.md) — data flow  
-- [config/data-connectors.md](../config/data-connectors.md)  
+Common issue:
+
+Unauthenticated request to AI Gateway
+
+What it means:
+
+AI_GATEWAY_API_KEY is not set
+This is expected during tests
+The app catches the error and returns a fallback response
+Tests only check the structure, not real AI output
+
+Supabase during tests:
+
+You might see:
+
+[Supabase] Insert skipped
+This is fine and does not fail the test
+How to Debug
+
+Run:
+
+npm run test
+
+Make sure tests pass
+
+To use real AI locally:
+Add AI_GATEWAY_API_KEY to .env.local
+Restart the dev server
+To test Supabase inserts:
+Set:
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY (recommended)
+Restart server
+Trigger a generate request
+
+Look for:
+
+[Supabase] generations row inserted ok
+If you get a 403 error:
+Check Vercel AI Gateway billing
+Look at the error response
+Notes
+Web Audio issues will not show up in tests, use browser DevTools
+For database testing in CI, use a test Supabase project or mock the client
