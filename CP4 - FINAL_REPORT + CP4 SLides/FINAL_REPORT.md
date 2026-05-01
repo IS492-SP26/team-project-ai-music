@@ -144,11 +144,8 @@ Each question was scored out of 1 point (total = 5).
 
 ### Appendix C: Sample Outputs from BeatAI
 
-- Frequently missed questions before using the app as well as average score
-- Frequently missed questions after using the app as well as average score
-- Sample Input from a user while testing the app
-- Sample App Explanations for certain settings
-- AI Feedback given for a certain track
+https://docs.google.com/document/d/1gVfuGTqPt7VkB5YO1dQJF1xgLI_fX1i2k0LAMoCVfhs/edit?usp=sharing
+
 
 ### Appendix D: Raw Data Summary
 
