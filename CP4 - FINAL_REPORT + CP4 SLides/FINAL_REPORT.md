@@ -1,39 +1,39 @@
 # BeatAI: Guided Beat Generation for Beginner Music Creators
 
-**Krish Golcha, Vishruth Gonur, Inika Sahai, Jihan Karim**  
-**App Link:** https://v0-music-and-explanation.vercel.app/
+Krish Golcha, Vishruth Gonur, Inika Sahai, Jihan Karim
+App Link: https://v0-music-and-explanation.vercel.app/
 
 ## Abstract
 
-A lot of beginners want to make music but don't really know where to start. Tools like Suno can output a full song from a prompt, but they don't teach you anything about why the song works. On the other hand, ChatGPT can talk about music theory all day but can't actually produce something you can listen to. We built BeatAI to sit somewhere in between: it generates structured beats (intro, verse, chorus) along with short explanations of the musical choices behind them. This paper describes a user study we ran to test whether pairing generation with music theory explanations actually helps beginners learn. We worked with 10 beginner participants using a before-and-after study design. We measured their understanding of five core music concepts (rhythm, instrumentation, and tempo/BPM) before and after interacting with the system. Our results suggest that AI creativity tools work better when they teach as they generate, rather than just producing output.
+A lot of beginners want to make music but don't really know where to start. Tools like Suno can output a full song from a prompt, but they don't teach you anything about why the song works. On the other hand, ChatGPT can talk about music theory all day but can't actually produce something you can listen to. We built BeatAI to become the crossroads of the two: generating structured beats (intro, verse, chorus) along with short explanations of the musical choices behind them. This paper describes a user study we conducted to test whether pairing generation with music theory explanations actually helps beginners learn. We worked with 10 beginner participants using a before-and-after study design. We measured their understanding of five core music concepts (rhythm, instrumentation, and tempo/BPM) before and after interacting with the system. Our results suggest that AI creativity tools work better when they teach as they generate, rather than just producing output.
 
 ## Introduction and Related Work
 
-Music creation is a new venture that many artificial intelligence systems are starting to advance in recently. AI music tools have gotten really good in the last couple of years. Suno and Udio can generate a whole track from a single sentence andChatGPT and Gemini can help with lyrics and song structure. However, if you sat down with a beginner and watched them try to utilize these tools, you start to notice a pattern. Most likely, users get an output and they don't enjoy it. From there, they do not know what to do next, so they just regenerate another song. Nothing about the process teaches them why their first prompt didn't work or what a chord progression even is. This reflects a bigger issue. Many of the current music generation tools are a black-box system, providing results with no room to learn or understand actual musical theories.
+Music creation is a new venture that many artificial intelligence systems are starting to advance in recently. AI music tools have gotten really good in the last couple of years. Suno and Udio can generate a whole track from a single sentence andChatGPT and Gemini can help with lyrics and song structure. However, nothing about the process teaches them why their first prompt didn't work or what a chord progression even is. This reflects a bigger issue. Many of the current music generation tools are a black-box system, providing results with no room to learn or understand actual musical theories.
 
 Prior research in AI music creation focused on improving the quality and coherence of generated outputs. Many of the earlier tools focused on rule-based systems; recent tools utilize deep learning models such as transformers or neural networks. Many of these recent systems focus on the long-term structure of a song along with how to properly model musical sequences. Transformer-based systems, for example, have proven to be highly capable of producing cohesive tunes (Ganapathy).
 
 To this day, many systems prioritize automation rather than user depth. Tonal relationships and structural reasonings are essential elements of music that are often missed in current AI music models. This limits their ability to mirror the creativity that goes into the song writing process. In a similar light, research on unsupervised music representation emphasizes that modern systems poorly model “mid-level music structure” because they cannot repeat patterns or compositions that are foundational to a song (Wang).
 
-From our observations in earlier checkpoints (CP1 and CP2), we noticed that beginners often follow a general pattern when generating music on platforms like Suno or Udio. They generate a track, feel unsatisfied with the music, and then regenerate without understanding what went wrong. This creates a black-box system that can produce good music, but has very little user control. When we compare this to LLM’s like Grok or ChatGPT, these tools can explain musical concepts but fail to produce actual music. As a result, users are forced to switch between tools that do not work well with each other.
+From our observations in earlier checkpoints (CP1 and CP2), we noticed that beginners often follow a general pattern when generating music on platforms like Suno or Udio. They generate a track, feel unsatisfied with the music, and then regenerate without understanding what went wrong. This creates a system that can produce good music, but has very little user control. When we compare this to LLM’s like Grok or ChatGPT, these tools can explain musical concepts but fail to produce actual music. As a result, users are forced to switch between tools that do not work well with each other.
 
 This gap is notably important for beginners. Unlike experienced producers, beginners are not just looking for a finished product, but they also want to understand how music works. Prior research in human-AI co-creation suggests that excessive automation can reduce user agency and limit skill development. Interactive systems that provide feedback during the creative process are more effective for both engagement and learning.
 
 BeatAI builds on these insights by combining AI powered generation with proper explanations. The system generates a short audio clip from a user prompt, along with user based settings such as BPM, chord suggestions, and section labels (Intro, Verse, Chorus). The musical output is produced alongside short, targeted explanations that describe why certain musical choices work or don’t work in the piece. Unlike traditional tools, BeatAI does not focus solely on output quality. Instead, it aims to support learning through interaction, helping users connect what they hear to how music is constructed.
 
-The goal of this study is to find out whether this approach, combining generation with explanation, actually improves beginner understanding of music concepts. Rather than asking whether BeatAI produces better music, we focus on whether it helps users learn while creating.
+The goal of this study is to find out whether this approach that combines generation with explanation actually improves beginner understanding of music concepts. Rather than asking whether BeatAI produces better music, we focus on whether it helps users learn while creating.
 
 ## Method:
 
 ### System Description
 
-BeatAI is a web app deployed on Vercel with a backend that calls Gemini. The user enters a prompt describing a mood or theme, like "happy summer vibe" or "melancholic late-night track," and the user then can mess with a bunch of settings like mood, vibe, instruments, BPM etc. There are also demos, so users can hear things before they select them and explanations at the top of each box as well talking about what the setting actually does for the output.
+BeatAI is a web app deployed on Vercel with a backend that calls Gemini. The user enters a prompt describing a mood or theme, like "happy summer vibe" or "melancholic late-night track," and the user then can mess with a bunch of settings like mood, vibe, instruments, BPM etc. There are also sound-demos, so users can hear things before they select them and read explanations at the top of each box so users can see what the setting actually does for each input.
 
 Since the output is an audio clip, users experience the result first and then rely on the explanation layer to understand what is happening inside the track. This makes the explanations even more important. Instead of interacting with structure directly, users can build their understanding by connecting what they hear to what the system explains.
 
-Initially, we had long-winded explanations that were confusing and were completely generated by Grok or ChatGPT. The problem with this was that early user testers (Checkpoint 2 user testing) complained that there were way too many words on the screen, and they often did not understand or even read all the words. This resulted in them not even learning, and simply pressing random buttons till they got a piece they like.
+Initially, we had long-winded explanations that were confusing and were completely generated by Grok or ChatGPT. The problem with this was that early user testers (CP 2 user testing) complained that there were way too many words on the screen, and they often did not understand or even read all the words. This resulted in them not even learning, and simply pressing random buttons till they got an audio they liked.
 
-After understanding this, we completely changed the explanations and changed them from multiple paragraphs to one singular paragraph. This way we can still keep technical depth while also making it easier for the audience to understand. Regardless, there were still some complaints that the text was too long, however we made a decision that any shorter text would comprise the learning aspect. As a result we did not make them any shorter
+After understanding this, we completely changed the explanations and changed them from multiple paragraphs to one singular paragraph. This way we can still keep technical depth while also making it easier for the audience to understand. Regardless, there were still some complaints that the text was too long, however we made a decision that any shorter text would comprise the learning aspect. As a result, we did not make them any shorter.
 
 User testing revealed that our system was a success, and students were genuinely understanding basic musical skills. Around 90% of users correctly understood the difference between mood and excitement, and most were able to explain how different parts of a track work together. However, rhythm patterns remained the most difficult area, with many users still struggling to consistently identify the correct drum structure. This validated that while the explanation layer improved understanding overall, rhythm-specific guidance needs further improvement, something aside from basic AI explanations
 
@@ -55,7 +55,7 @@ Our quiz had 5 multiple-choice questions focused on the core ideas used inside B
 
 ### Measures
 
-In order to measure success we used the quiz scores. There were 5 questions in the quiz and each questions had 4 options, with only one of them being correct. Each user was given a score from 1-5 depending on how many questions they got correct. Quiz scores varied depending on if a student took them before or after using the app. Typically students had lower scores before using the app, and higher scores after using the app, with only one question being frequently missed after the fact compared to 4 frequently missed questions prior to app usage.
+In order to measure success we used the quiz scores. There were 5 questions in the quiz and each question had 4 options, with only one of them being correct. Each user was given a score from 1-5 depending on how many questions they got correct. Quiz scores varied depending on if a student took them before or after using the app. Typically students had lower scores before using the app, and higher scores after using the app. We found that, only one question was missed after the fact compared to 4 frequently missed questions prior to app usage.
 
 ### Considerations
 
@@ -75,7 +75,7 @@ However, rhythm was still the weakest area. Even after using the app, some users
 
 This makes sense, as understanding what “Four on the floor” is and what “Trap Hi-Hats” is very hard for a beginner to understand. It also does not help, that the specific explanation for the “Drum Pattern” setting is somewhat vague. Nevertheless this was something to keep in mind, and a weakness we noticed within our app.
 
-Ultimately the results suggested that BeatAI does help beginners learn basic music concepts while creating. But the learning was not equal across all concepts. Ideas on Mood, excitement and instrument types improved the most, but topics such as rhythm and layering still needed more support.
+Ultimately the results suggested that BeatAI does help beginners learn basic music concepts while creating. But the learning was not equal across all concepts. Ideas on mood, excitement and instrument types improved the most, but  topics such as rhythm and layering still needed more support.
 
 ## Group Takeaways:
 
@@ -89,9 +89,9 @@ Ultimately more structured revisions are needed such that we can decide what dir
 
 ## Limitations:
 
-There are a few limitations we noticed within our study, the first being our sample size is small: 10 total participants with 5 multiple choice questions isn't enough to support a really strong statistical causation, and the results we noticed should be more correlative rather than confirmatory. The session was also short. Whether the knowledge gains in the explanation group actually persist a week later is something this study can't answer.
+There are a few limitations we noticed within our study, the first being our sample size is small: 10 total participants with 5 multiple choice questions isn't enough to support a really strong statistical causation, and the results we noticed should be more correlative rather than confirmatory. The session was also short. Whether the knowledge gained in the explanation group actually persist a week later is something this study can't answer.
 
-The baseline was musical knowledge before and after using the app, this keeps the comparison clean but doesn't tell us how BeatAI stacks up against, say, ChatGPT or Suno, however that comparison was done in CP3 and we chose not to repeat it here. Lastly, the prototype itself is incomplete. The current prototype does not support editable representations like MIDI or downloadable songs, all of which limit how much users can directly manipulate the structure of a generated track
+The baseline was musical knowledge before and after using the app, this keeps the comparison clean but doesn't tell us how BeatAI stacks up against, say, ChatGPT or Suno. Lastly, the prototype itself is incomplete. The current prototype does not support editable representations like MIDI or downloadable songs, all of which limit how much users can directly manipulate the structure of a generated track
 
 ## Risks and Ethical Considerations
 
@@ -109,38 +109,37 @@ More broadly, we think the lesson here generalizes beyond music. AI tools aimed 
 
 ## References
 
-- Briot, J. P., Hadjeres, G., & Pachet, F. (2020). *Deep learning techniques for music generation: A survey*. Springer.
-- Ganapathy, N. D., et al. (2025). *An agent-based framework for automated higher-voice harmony generation*. arXiv preprint.
-- Huang, C. A., et al. (2018). *Music transformer: Generating music with long-term structure*. International Conference on Learning Representations (ICLR).
-- Kulesza, T., Burnett, M., Wong, W. K., & Stumpf, S. (2015). *Principles of explanatory debugging to personalize interactive machine learning*. Proceedings of the 20th International Conference on Intelligent User Interfaces.
-- Oppenlaender, J. (2022). *The creativity support index: Evaluating AI-assisted creativity tools*. Human–Computer Interaction Journal.
-- Wang, T., et al. (2025). *Discovering “words” in music: Unsupervised learning of compositional sparse code for symbolic music*. arXiv preprint.
-- OpenAI. (2023). *ChatGPT: Optimizing language models for dialogue*. https://openai.com
-- Google. (2023). *Gemini AI model documentation*. https://ai.google.dev
-- Suno AI. (2024). *Suno music generation platform*. https://suno.ai
-- Udio AI. (2024). *Udio music generation platform*. https://udio.com
+Briot, J. P., Hadjeres, G., & Pachet, F. (2020). Deep learning techniques for music generation: A survey. Springer.
+Ganapathy, N. D., et al. (2025). An agent-based framework for automated higher-voice harmony generation. arXiv preprint.
+Huang, C. A., et al. (2018). Music transformer: Generating music with long-term structure. International Conference on Learning Representations (ICLR).
+Kulesza, T., Burnett, M., Wong, W. K., & Stumpf, S. (2015). Principles of explanatory debugging to personalize interactive machine learning. Proceedings of the 20th International Conference on Intelligent User Interfaces.
+Oppenlaender, J. (2022). The creativity support index: Evaluating AI-assisted creativity tools. Human–Computer Interaction Journal.
+Wang, T., et al. (2025). Discovering “words” in music: Unsupervised learning of compositional sparse code for symbolic music. arXiv preprint.
+
+OpenAI. (2023). ChatGPT: Optimizing language models for dialogue. https://openai.com
+Google. (2023). Gemini AI model documentation. https://ai.google.dev
+Suno AI. (2024). Suno music generation platform. https://suno.ai
+Udio AI. (2024). Udio music generation platform. https://udio.com
 
 ## Appendices
 
 ### Appendix A: Pre/Post Knowledge Survey
 
 Participants answered the following 5 multiple-choice questions:
-
-- What does BPM control in a track?
-- Your track feels “thin.” What should you adjust first?
-- What is the difference between mood and excitement?
-- Which drum pattern creates a steady club rhythm?
-- Why do fewer instruments often sound cleaner?
-
+What does BPM control in a track?
+Your track feels “thin.” What should you adjust first?
+What is the difference between mood and excitement?
+Which drum pattern creates a steady club rhythm?
+Why do fewer instruments often sound cleaner?
 Each question was scored out of 1 point (total = 5).
 
 ### Appendix B: Study Procedure Script
 
-- Participants complete pre-test (5 questions)
-- Participants use BeatAI for ~20 minutes
-- Participants explore freely (no external instruction)
-- Participants complete post-test
-- Responses recorded for analysis
+Participants complete pre-test (5 questions)
+Participants use BeatAI for ~20 minutes
+Participants explore freely (no external instruction)
+Participants complete post-test
+Responses recorded for analysis
 
 ### Appendix C: Sample Outputs from BeatAI
 
@@ -149,24 +148,26 @@ https://docs.google.com/document/d/1gVfuGTqPt7VkB5YO1dQJF1xgLI_fX1i2k0LAMoCVfhs/
 
 ### Appendix D: Raw Data Summary
 
-- Number of participants: 10
-- Pre-test average: 1.6 / 5
-- Post-test average: ~3.7 / 5
-- Largest improvements: Mood vs excitement, Instrument layering
-- Weakest area: Drum pattern recognition
+Number of participants: 10
+Pre-test average: 1.6 / 5
+Post-test average: ~3.7 / 5
+Largest improvements: Mood vs excitement, Instrument layering
+Weakest area:
+Drum pattern recognition
 
 ### Appendix E: Example Explanation (From System)
 
-**Example output explanation:**  
+Example output explanation:
 “A higher BPM increases the energy of the track, while major chords create a brighter emotional tone. Using fewer instruments reduces overlap and creates a cleaner sound.”
 
 ### Appendix F: Full Data for user study + Database
 
-**Google Form for (before using the app)**  
+Google Form for (before using the app)
 https://docs.google.com/spreadsheets/d/1NnkE33XzeMBfvOxUPAFg1LxGb5Nr8n_HKYGLJNoPVKc/edit?usp=sharing
 
-**Google Form for (after using the app)**  
+Google Form for (after using the app)
 https://docs.google.com/spreadsheets/d/1NnkE33XzeMBfvOxUPAFg1LxGb5Nr8n_HKYGLJNoPVKc/edit?usp=sharing
 
-**Database/ Total BeatAI responses**  
+Database/ Total BeatAI responses
 https://docs.google.com/spreadsheets/d/1Qx-FXM5vpm5A_rC5rGMxxYDYCI6CLuqYOTWzZn1-4g8/edit?usp=sharing
+::: 
